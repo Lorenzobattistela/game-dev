@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_HEIGHT 800
 #define SPRITE_WIDTH 26
 #define SPRITE_HEIGHT 36
 #define FRAME_ROWS 5

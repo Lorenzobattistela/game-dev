@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 LDFLAGS = -lSDL2 -lSDL2_image
 
-SRC = main.c
+SRC = error.c rendering.c game.c main.c
 OBJ = $(SRC:.c=.o)
 EXEC = sdl_app
 

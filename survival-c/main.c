@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
     Position t = { .x = 100, .y = 0 };
     obj->position = t;
     Position initialPosition = { .x = 0, .y = 0 };
-
+ 
     if (player == NULL) {
       error("failed to malloc player structure.");
     }
@@ -124,7 +124,8 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderCharacter(renderer, characterSpritesheet, player->position.x, player->position.y);
-        renderObject(renderer, obj);
+        renderFloor(renderer, "./assets/darkdimension.png");
+        //renderObject(renderer, obj);
         SDL_RenderPresent(renderer);
 
         frameTime = SDL_GetTicks() - frameStart;

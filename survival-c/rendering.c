@@ -44,8 +44,49 @@ void renderCharacter(SDL_Renderer* renderer, SDL_Texture* spritesheet, int x, in
     SDL_RenderCopy(renderer, spritesheet, &spriteClips[currentFrame], &renderQuad);
 }
 
+void renderFloor(SDL_Renderer* renderer, const char* path)
+{
+    int tileWidth = 65;
+    int tileHeight = 20;
 
+    SDL_Surface* surface = IMG_Load(path);
+    if (!surface) {
+        SDL_Log("Failed to load image: %s", IMG_GetError());
+        return;
+    }
 
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
 
+    if (!texture) {
+        SDL_Log("Failed to create texture: %s", SDL_GetError());
+        return;
+    }
+
+    SDL_Rect srcRect = {
+        .x = 0,
+        .y = 200,
+        .w = 65,
+        .h = 20,
+    };
+
+    int tilesX = (WINDOW_WIDTH + tileWidth - 1) / tileWidth;
+    int tilesY = (WINDOW_HEIGHT + tileHeight - 1) / tileHeight;
+
+    for (int y = 0; y < tilesY; y++) {
+        for (int x = 0; x < tilesX; x++) {
+            SDL_Rect dstRect = {
+                .x = x * tileWidth,
+                .y = y * tileHeight,
+                .w = tileWidth,
+                .h = tileHeight
+            };
+
+            SDL_RenderCopy(renderer, texture, &srcRect, &dstRect);
+        }
+    }
+
+    SDL_DestroyTexture(texture);
+}
 
 

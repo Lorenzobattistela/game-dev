@@ -20,6 +20,8 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = NULL;
     SDL_Event event;
 
+    Enemy **enemies = createEnemies(NUM_ENEMIES, 100, 100, 1);
+
     Player *player = malloc(sizeof(Player));
     Position initialPosition = { .x = 0, .y = 0 };
  
@@ -47,7 +49,13 @@ int main(int argc, char* argv[]) {
     }
 
     SDL_Texture *characterSpritesheet = loadSpritesheet(renderer, "./assets/bardo.png");
+    SDL_Texture *enemySpritesheet = loadEnemySpritesheet(renderer, "./assets/reaper.png");
 
+    if (TTF_Init() == -1) {
+      error("SDL_ttf could not initialize!");
+    }
+
+    
     while (state != QUIT) {
         frameStart = SDL_GetTicks();
  
@@ -101,8 +109,13 @@ int main(int argc, char* argv[]) {
 
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastPositionUpdateTime > POSITION_UPDATE_SPEED) {
+          if (hitAnyEnemy(player, enemies)) {
+            // handle life here
+            displayGameOver(renderer);
+            state = QUIT;
+          }
           updatePlayerPosition(player);
-          // clampObjectCollision (player, obj);
+          updateEnemiesPosition(player, enemies);
           clampPlayerPosition(player);
           lastPositionUpdateTime = currentTime;
         }
@@ -119,7 +132,7 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderFloor(renderer, "./assets/darkdimension.png");
-        renderEnemy(renderer, "./assets/reaper.png");
+        renderEnemies(renderer, enemySpritesheet, enemies);
         renderCharacter(renderer, characterSpritesheet, player->position.x, player->position.y);
         SDL_RenderPresent(renderer);
 

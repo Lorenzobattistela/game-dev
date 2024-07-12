@@ -1,8 +1,46 @@
-#include "rendering.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include "rendering.h"
 #include "error.h"
+#include "game.h"
+
+void displayGameOver(SDL_Renderer* renderer) {
+    TTF_Font* font = TTF_OpenFont("AntonSC-Regular.ttf", 64);
+    if (!font) {
+        error("Failed to load font");
+    }
+
+    SDL_Color textColor = {255, 0, 0, 255};  // Red color
+    SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, "Game Over", textColor);
+    if (!surfaceMessage) {
+        error("Failed to render text");
+    }
+
+    SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+    if (!message) {
+        error("Failed to create texture from rendered text");
+    }
+
+    int textWidth = surfaceMessage->w;
+    int textHeight = surfaceMessage->h;
+    SDL_Rect messageRect = {
+        (WINDOW_WIDTH - textWidth) / 2,
+        (WINDOW_HEIGHT - textHeight) / 2,
+        textWidth,
+        textHeight
+    };
+
+    SDL_RenderCopy(renderer, message, NULL, &messageRect);
+    SDL_RenderPresent(renderer);
+
+    SDL_FreeSurface(surfaceMessage);
+    SDL_DestroyTexture(message);
+    TTF_CloseFont(font);
+
+    SDL_Delay(3000);
+}
 
 void renderObject(SDL_Renderer* renderer, Object* obj) {
     SDL_Rect rect = {obj->position.x, obj->position.y, obj->width, obj->height};
@@ -11,14 +49,9 @@ void renderObject(SDL_Renderer* renderer, Object* obj) {
 }
 
 SDL_Rect spriteClips[ANIMATION_FRAMES];
+SDL_Rect enemyClips[ENEMY_ANIMATION_FRAMES];
 
 SDL_Texture *loadEnemySpritesheet(SDL_Renderer *renderer, const char *path) {
-  const int spriteWidth = 36;
-  const int spriteHeight = 40;
-  const int enemyCols = 3;
-  const int enemyRows = 4;
-  const int enemyFrames = enemyCols * enemyRows;
-
   SDL_Surface* loadedSurface = IMG_Load(path);
   if (loadedSurface == NULL) {
     error(IMG_GetError());
@@ -31,14 +64,15 @@ SDL_Texture *loadEnemySpritesheet(SDL_Renderer *renderer, const char *path) {
 
   SDL_FreeSurface(loadedSurface);
 
-  for (int i = 0; i < enemyFrames; i++) {
-      int row = i / enemyRows;
-      int col = i % enemyCols;
+  for (int i = 0; i < ENEMY_ANIMATION_FRAMES; i++) {
+      int row = i / ENEMY_ROWS;
+      int col = i % ENEMY_COLS;
       
-      spriteClips[i].x = col * spriteWidth;
-      spriteClips[i].y = row * spriteHeight;
-      spriteClips[i].w = spriteWidth;
-      spriteClips[i].h = spriteHeight;
+      // -5 is a pixel error on the sheet
+      enemyClips[i].x = (col * ENEMY_WIDTH) - 5;
+      enemyClips[i].y = row * ENEMY_HEIGHT;
+      enemyClips[i].w = ENEMY_WIDTH;
+      enemyClips[i].h = ENEMY_HEIGHT;
     }
     return spritesheet;
 }
@@ -75,11 +109,22 @@ void renderCharacter(SDL_Renderer* renderer, SDL_Texture* spritesheet, int x, in
     SDL_RenderCopy(renderer, spritesheet, &spriteClips[currentFrame], &renderQuad);
 }
 
-void renderEnemy(SDL_Renderer *renderer, SDL_Texture *spritesheet, Position pos, int spriteWidth, int spriteHeight) {
+void renderEnemy(SDL_Renderer *renderer, SDL_Texture *spritesheet, Enemy *enemy) {
+  SDL_Rect renderQuad = { enemy->position.x, enemy->position.y, ENEMY_WIDTH, ENEMY_HEIGHT };
+  // frames_t currentFrame = getEnemyFrame(enemy);
+  frames_t currentFrame = enemy->currentFrame;
+  SDL_RenderCopy(renderer, spritesheet, &enemyClips[currentFrame], &renderQuad);
 }
 
-void renderFloor(SDL_Renderer* renderer, const char* path)
-{
+void renderEnemies(SDL_Renderer *renderer, SDL_Texture *spritesheet, Enemy **enemies) {
+  for (int i = 0; i < NUM_ENEMIES; i++) {
+    if (enemies[i] != NULL) {
+      renderEnemy(renderer, spritesheet, enemies[i]);
+    }
+  }
+}
+
+void renderFloor(SDL_Renderer* renderer, const char* path) {
     int tileWidth = 45;
     int tileHeight = 20;
 

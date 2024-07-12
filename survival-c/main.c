@@ -123,8 +123,8 @@ int main(int argc, char* argv[]) {
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        renderCharacter(renderer, characterSpritesheet, player->position.x, player->position.y);
         renderFloor(renderer, "./assets/darkdimension.png");
+        renderCharacter(renderer, characterSpritesheet, player->position.x, player->position.y);
         //renderObject(renderer, obj);
         SDL_RenderPresent(renderer);
 

@@ -46,7 +46,7 @@ void renderCharacter(SDL_Renderer* renderer, SDL_Texture* spritesheet, int x, in
 
 void renderFloor(SDL_Renderer* renderer, const char* path)
 {
-    int tileWidth = 65;
+    int tileWidth = 45;
     int tileHeight = 20;
 
     SDL_Surface* surface = IMG_Load(path);
@@ -64,9 +64,9 @@ void renderFloor(SDL_Renderer* renderer, const char* path)
     }
 
     SDL_Rect srcRect = {
-        .x = 0,
+        .x = 16,
         .y = 200,
-        .w = 65,
+        .w = 45,
         .h = 20,
     };
 

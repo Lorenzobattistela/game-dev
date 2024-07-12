@@ -21,11 +21,6 @@ int main(int argc, char* argv[]) {
     SDL_Event event;
 
     Player *player = malloc(sizeof(Player));
-    Object *obj = malloc(sizeof(Object));
-    obj->width = 100;
-    obj->height = 100;
-    Position t = { .x = 100, .y = 0 };
-    obj->position = t;
     Position initialPosition = { .x = 0, .y = 0 };
  
     if (player == NULL) {
@@ -107,7 +102,7 @@ int main(int argc, char* argv[]) {
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastPositionUpdateTime > POSITION_UPDATE_SPEED) {
           updatePlayerPosition(player);
-          clampObjectCollision (player, obj);
+          // clampObjectCollision (player, obj);
           clampPlayerPosition(player);
           lastPositionUpdateTime = currentTime;
         }
@@ -124,8 +119,8 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderFloor(renderer, "./assets/darkdimension.png");
+        renderEnemy(renderer, "./assets/reaper.png");
         renderCharacter(renderer, characterSpritesheet, player->position.x, player->position.y);
-        //renderObject(renderer, obj);
         SDL_RenderPresent(renderer);
 
         frameTime = SDL_GetTicks() - frameStart;

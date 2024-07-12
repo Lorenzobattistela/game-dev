@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define WINDOW_WIDTH 800
+#define WINDOW_WIDTH 950
 #define WINDOW_HEIGHT 800
 #define SPRITE_WIDTH 26
 #define SPRITE_HEIGHT 36

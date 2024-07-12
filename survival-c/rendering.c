@@ -12,6 +12,37 @@ void renderObject(SDL_Renderer* renderer, Object* obj) {
 
 SDL_Rect spriteClips[ANIMATION_FRAMES];
 
+SDL_Texture *loadEnemySpritesheet(SDL_Renderer *renderer, const char *path) {
+  const int spriteWidth = 36;
+  const int spriteHeight = 40;
+  const int enemyCols = 3;
+  const int enemyRows = 4;
+  const int enemyFrames = enemyCols * enemyRows;
+
+  SDL_Surface* loadedSurface = IMG_Load(path);
+  if (loadedSurface == NULL) {
+    error(IMG_GetError());
+  }
+
+  SDL_Texture* spritesheet = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+  if (spritesheet == NULL) {
+    error(SDL_GetError());
+  }
+
+  SDL_FreeSurface(loadedSurface);
+
+  for (int i = 0; i < enemyFrames; i++) {
+      int row = i / enemyRows;
+      int col = i % enemyCols;
+      
+      spriteClips[i].x = col * spriteWidth;
+      spriteClips[i].y = row * spriteHeight;
+      spriteClips[i].w = spriteWidth;
+      spriteClips[i].h = spriteHeight;
+    }
+    return spritesheet;
+}
+
 SDL_Texture* loadSpritesheet(SDL_Renderer* renderer, const char* path) {
     SDL_Surface* loadedSurface = IMG_Load(path);
     if (loadedSurface == NULL) {
@@ -44,6 +75,9 @@ void renderCharacter(SDL_Renderer* renderer, SDL_Texture* spritesheet, int x, in
     SDL_RenderCopy(renderer, spritesheet, &spriteClips[currentFrame], &renderQuad);
 }
 
+void renderEnemy(SDL_Renderer *renderer, SDL_Texture *spritesheet, Position pos, int spriteWidth, int spriteHeight) {
+}
+
 void renderFloor(SDL_Renderer* renderer, const char* path)
 {
     int tileWidth = 45;
@@ -51,16 +85,14 @@ void renderFloor(SDL_Renderer* renderer, const char* path)
 
     SDL_Surface* surface = IMG_Load(path);
     if (!surface) {
-        SDL_Log("Failed to load image: %s", IMG_GetError());
-        return;
+      error(IMG_GetError());
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 
     if (!texture) {
-        SDL_Log("Failed to create texture: %s", SDL_GetError());
-        return;
+      error(SDL_GetError());
     }
 
     SDL_Rect srcRect = {
